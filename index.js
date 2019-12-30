@@ -4,11 +4,11 @@ require("dotenv").config();
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 // Routes imports
 const routes = require("./routes");
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(routes);
 

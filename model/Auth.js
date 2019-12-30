@@ -3,13 +3,14 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db");
-const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
 
 const userSchema = new mongoose.Schema(
   {
-    firsName: {
-      type: String
+    firstName: {
+      type: String,
+      trim: true,
+      default: null
     },
     lastName: {
       type: String,
@@ -54,16 +55,17 @@ const userSchema = new mongoose.Schema(
       required: true
     },
     secretToken: {
-      type: String
+      type: String,
+      default: null
     },
-    tokens: [
-      {
-        token: {
-          type: String,
-          required: true
-        }
-      }
-    ]
+    qrCode: {
+      type: String,
+      default: null
+    },
+    token: {
+      type: String,
+      required: true
+    }
   },
   {
     timestamps: true
@@ -77,26 +79,26 @@ userSchema.pre("save", async function(next) {
     const pwd = await bcrypt.hash(user.password, 8);
     user.password = pwd;
   } catch (error) {
-    return new Error(error);
+    throw new Error(error);
   }
   next();
 });
 
 // findByEmail
-userSchema.statics.findByEmail = async function(params) {
+userSchema.statics.findByEmail = async function(email, password) {
   try {
-    const isValid = await User.findOne({ email: params.email });
+    const isValid = await User.findOne({ email });
     if (isValid) {
-      const pwd = await bcrypt.compare(params.password, isValid.password);
+      const pwd = await bcrypt.compare(password, isValid.password);
       if (pwd) {
         return isValid;
       } else {
-        return generateMsg("error", msg.pwdNotMatch);
+        throw new Error(msg.pwdNotMatch);
       }
     }
-    return generateMsg("error", msg.userNotFound);
+    throw new Error(msg.userNotFound);
   } catch (error) {
-    return new Error(error);
+    throw new Error(error);
   }
 };
 
@@ -107,7 +109,7 @@ userSchema.methods.generateToken = async function() {
     { _id: user._id.toString() },
     process.env.SECRET_KEY
   );
-  user.tokens = user.tokens.concat({ token });
+  user.token = token;
 };
 
 const User = mongoose.model("User", userSchema);

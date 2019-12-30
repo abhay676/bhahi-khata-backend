@@ -6,5 +6,8 @@ module.exports = {
 
   loginSuccess: "User register successfully",
   userNotFound: "User not found",
-  pwdNotMatch: "Password don't match"
+  pwdNotMatch: "Password don't match",
+  qrCodeSuccess: "QR-Code generated successfully",
+  userDeleteSuccess: "User deleted successfully",
+  userUpdateSuccess: "User updated successfully"
 };
