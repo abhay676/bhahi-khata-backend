@@ -4,6 +4,7 @@ const msg = require("../utils/ToastMsg");
 
 // TODO: req.body is undefined
 
+//! Constroller for login an existing user
 // GET
 exports.login = async (req, res, next) => {
   try {
@@ -19,6 +20,7 @@ exports.login = async (req, res, next) => {
   }
 };
 
+//! Controller for New User
 // POST
 exports.register = async (req, res, next) => {
   try {
@@ -35,4 +37,13 @@ exports.register = async (req, res, next) => {
   } catch (error) {
     return new Error(error);
   }
+};
+
+//! Controller for deleting/removing account of an user
+// Delete //TODO: NOT Completed YET
+exports.deleteAcc = async (req, res, next) => {
+  try {
+    const userEmail = req.body.email;
+    const user = await User.findByIdAndDelete();
+  } catch (error) {}
 };
