@@ -2,9 +2,11 @@
  * CustomError responsible for generating error of custom type for front-end usage.
  */
 
-module.exports = function(type, title) {
+module.exports = function(title, type, code, body) {
   return {
-    variant: type,
-    title
+    title,
+    type,
+    code,
+    body
   };
 };

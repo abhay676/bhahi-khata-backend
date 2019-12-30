@@ -1,3 +1,5 @@
+const speakeasy = require("speakeasy");
+const qrcode = require("qrcode");
 const User = require("../model/Auth");
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
@@ -16,7 +18,7 @@ exports.login = async (req, res, next) => {
     await user.generateToken();
     res.send(user);
   } catch (error) {
-    return new Error(error);
+    return generateMsg("ERROR", "error", 401, error);
   }
 };
 
@@ -33,9 +35,9 @@ exports.register = async (req, res, next) => {
       targetAmt: req.body.targetAmt
     });
     await user.save();
-    res.send(generateMsg("success", msg.loginSuccess));
+    res.send(generateMsg("SUCCESS", "success", 200, msg.loginSuccess));
   } catch (error) {
-    return new Error(error);
+    return generateMsg("ERROR", "error", 401, error);
   }
 };
 
@@ -46,4 +48,24 @@ exports.deleteAcc = async (req, res, next) => {
     const userEmail = req.body.email;
     const user = await User.findByIdAndDelete();
   } catch (error) {}
+};
+
+//! For 2-Factor-Authentication
+exports.twoFA = async (req, res, next) => {
+  const id = req.params.id;
+  let imageUrl;
+  const secret = speakeasy.generateSecret({ length: 20 });
+  qrcode.toDataURL(secret.base32, function(err, image) {
+    if (err) {
+      return generateMsg("ERROR", "error", 401, err);
+    }
+    imageUrl = image;
+  });
+  const user = await User.findByIdAndUpdate(
+    id,
+    { secretToken: secret },
+    { new: true }
+  );
+  if (!user) return generateMsg("NOT FOUND", "error", 401, msg.userNotFound);
+  return { user, imageUrl };
 };

@@ -39,10 +39,6 @@ const userSchema = new mongoose.Schema(
         message: msg => `Invalid mobile number.`
       }
     },
-    password: {
-      type: String,
-      required: true
-    },
     targetAmt: {
       type: String,
       required: true,
@@ -52,6 +48,13 @@ const userSchema = new mongoose.Schema(
         },
         message: amt => `Invalid target amount.`
       }
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    secretToken: {
+      type: String
     },
     tokens: [
       {
