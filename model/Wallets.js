@@ -2,11 +2,12 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 require("../db");
 
-const expensesSchema = new mongoose.Schema(
+const walletsSchema = new mongoose.Schema(
   {
-    merchantName: {
+    name: {
       type: String,
-      required: true
+      required: true,
+      unique: true
     },
     amount: {
       type: String,
@@ -15,30 +16,24 @@ const expensesSchema = new mongoose.Schema(
         validator: function(amt) {
           return validator.isNumeric(amt);
         },
-        message: amt => `Invalid expense amount!`
+        message: amt => `Invalid wallet amount!`
       }
     },
-    event: {
+    currencyType: {
       type: String,
-      default: null
-    },
-    location: {
-      type: String,
-      default: null
-    },
-    date: {
-      type: Date
-    },
-    description: {
-      type: String
+      required: true
     },
     category: {
       type: String,
       required: true
     },
-    wallet: {
+    icon: {
+      type: String
+    },
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Wallets"
+      ref: "User",
+      required: true
     }
   },
   {
@@ -46,6 +41,8 @@ const expensesSchema = new mongoose.Schema(
   }
 );
 
-const Expenses = mongoose.model("Expenses", expensesSchema);
+// Virtual field of expenses and budget
 
-module.exports = Expenses;
+const Wallets = mongoose.model("Wallets", walletsSchema);
+
+module.exports = Wallets;
