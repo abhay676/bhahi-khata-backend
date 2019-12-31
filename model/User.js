@@ -2,11 +2,14 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const db = require("../db");
+require("../db");
 const msg = require("../utils/ToastMsg");
 
 const userSchema = new mongoose.Schema(
   {
+    userImage: {
+      type: String
+    },
     firstName: {
       type: String,
       trim: true,
@@ -40,21 +43,11 @@ const userSchema = new mongoose.Schema(
         message: msg => `Invalid mobile number.`
       }
     },
-    targetAmt: {
-      type: String,
-      required: true,
-      validate: {
-        validator: function(amt) {
-          return validator.isNumeric(amt, { no_symbols: true });
-        },
-        message: amt => `Invalid target amount.`
-      }
-    },
     password: {
       type: String,
       required: true
     },
-    secretToken: {
+    qrToken: {
       type: String,
       default: null
     },
@@ -71,6 +64,13 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Wallets virtual field
+userSchema.virtual("wallets", {
+  ref: "Wallets",
+  localField: "_id",
+  foreignField: "user"
+});
 
 // Hashing the password
 userSchema.pre("save", async function(next) {

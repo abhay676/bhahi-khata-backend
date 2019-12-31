@@ -1,20 +1,20 @@
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
-const User = require("../model/Auth");
+const User = require("../model/User");
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
 
 //! Controller for New User
 // POST
 exports.register = async (req, res, next) => {
+  const { firstName, lastName, email, mobile, password } = req.body;
   try {
     const user = new User({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      mobile: req.body.mobile,
-      password: req.body.password,
-      targetAmt: req.body.targetAmt
+      firstName,
+      lastName,
+      email,
+      mobile,
+      password
     });
     await user.generateToken();
     await user.save();
@@ -83,6 +83,19 @@ exports.twoFA = async (req, res, next) => {
     );
     if (!user) throw new Error(msg.userNotFound);
     res.send(generateMsg(msg.qrCodeSuccess, "success", user));
+  } catch (error) {
+    res.send(generateMsg(null, "error", error));
+  }
+};
+
+//! For Fetching all Wallets associated to that user
+// GET
+exports.allWallets = async (req, res, next) => {
+  const id = req.user._id;
+  try {
+    const user = await User.findById(id);
+    await user.populate("wallets").execPopulate();
+    res.send(generateMsg(msg.walletsFetchSuccess, "success", user.wallets));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }
