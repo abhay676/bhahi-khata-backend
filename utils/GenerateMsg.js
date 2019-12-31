@@ -6,7 +6,8 @@
 
 module.exports = function(heading, type, body) {
   let code;
-  const msg = heading || "Something went wrong";
+  let msg = heading || "Something went wrong";
+
   if (type === "success") {
     code = 200;
   } else {
@@ -17,6 +18,11 @@ module.exports = function(heading, type, body) {
     if (typeof body === "object") {
       body = body.errmsg || body.message;
     }
+  }
+  // If record was deleted
+  if (body === null) {
+    body = "Record not exists";
+    msg = "Record not exists";
   }
   return {
     msg,
