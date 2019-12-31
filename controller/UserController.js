@@ -24,7 +24,7 @@ exports.register = async (req, res, next) => {
   }
 };
 
-//! Constroller for login an existing user
+//! Controller for login an existing user
 // POST
 exports.login = async (req, res, next) => {
   try {

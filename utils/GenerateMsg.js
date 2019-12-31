@@ -1,6 +1,6 @@
 /**
  * CustomError responsible for generating error of custom type for front-end usage.
- * Code are not as per standarad.
+ * Code are not as per standard.
  * code for internal error => 300
  */
 
