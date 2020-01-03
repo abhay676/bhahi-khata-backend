@@ -94,6 +94,7 @@ exports.allWallets = async (req, res, next) => {
   const id = req.user._id;
   try {
     const user = await User.findById(id);
+    if (!user) throw new Error(msg.userNotFound);
     await user.populate("wallets").execPopulate();
     res.send(generateMsg(msg.walletsFetchSuccess, "success", user.wallets));
   } catch (error) {

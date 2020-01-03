@@ -1,4 +1,5 @@
 const Wallets = require("../model/Wallets");
+const User = require("../model/User");
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
 
@@ -8,7 +9,9 @@ exports.add = async (req, res, next) => {
   const id = req.user._id;
   try {
     const wallet = new Wallets({ ...req.body, user: id });
-    await wallet.save();
+    wallet.save().then(document => {
+      return User.findByIdAndUpdate(id, { activeWallet: wallet._id });
+    });
     res.send(wallet);
   } catch (error) {
     res.send(generateMsg(null, "error", error));

@@ -26,19 +26,21 @@ const expensesSchema = new mongoose.Schema(
       type: String,
       default: null
     },
-    date: {
-      type: Date
+    userDate: {
+      type: Date,
+      default: null
     },
     description: {
-      type: String
+      type: String,
+      default: null
     },
     category: {
       type: String,
       required: true
     },
-    wallet: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Wallets"
+    walletId: {
+      type: String,
+      required: true
     }
   },
   {
