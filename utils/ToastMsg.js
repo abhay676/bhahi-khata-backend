@@ -18,5 +18,12 @@ module.exports = {
   walletCreateSuccess: "Wallet created successfully",
   walletDeleteSuccess: "Wallet deleted successfully",
   walletUpdateSuccess: "Wallet updated successfully",
-  walletFreeze: "Wallet is freezed"
+  walletFreeze: "Wallet is freezed",
+
+  // EXPENSES
+  expenseAllSuccess: "All expenses fetched successfully",
+  expenseCreateSuccess: "Expenses added successfully",
+  expenseUpdateSuccess: "Expenses updated successfully",
+  expenseDeletedSuccess: "Expenses deleted successfully",
+  expenseCreateError: "Expenses not added"
 };

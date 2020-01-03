@@ -11,6 +11,7 @@ const auth = require("./middleware/Auth");
 // Controllers
 const loginController = require("./controller/UserController");
 const walletsController = require("./controller/WalletsController");
+const expensesController = require("./controller/ExpensesController");
 
 // LOGIN routes
 router.post("/login", loginController.login);
@@ -26,4 +27,10 @@ router.patch("/api/wallets/update/:id", auth, walletsController.update);
 router.delete("/api/wallets/delete/:id", auth, walletsController.delete);
 
 // EXPENSES routes
+router.post("/api/expenses/add", auth, expensesController.add);
+router.patch("/api/expenses/update/:id", auth, expensesController.update);
+router.delete("/api/expenses/delet/:id", auth, expensesController.delete);
+// ? Fetch All expenses for a particular Wallet
+router.get("/api/expenses/all", auth, expensesController.all);
+
 module.exports = router;
