@@ -27,6 +27,10 @@ const walletsSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    active: {
+      type: Boolean,
+      default: null
+    },
     icon: {
       type: String
     },
@@ -35,19 +39,23 @@ const walletsSchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
-    expenses: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
-      }
-    ]
+    budget: {
+      type: Number,
+      default: null
+    }
   },
   {
     timestamps: true
   }
 );
 
-// Virtual field of expenses and budget
+//* Virtual field of expenses
+
+walletsSchema.virtual("transactions", {
+  ref: "Expenses",
+  localField: "_id",
+  foreignField: "walletId"
+});
 
 const Wallets = mongoose.model("Wallets", walletsSchema);
 

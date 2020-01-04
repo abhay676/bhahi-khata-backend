@@ -55,10 +55,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null
     },
-    activeWallet: {
-      type: String,
-      default: null
-    },
     token: {
       type: String,
       required: true

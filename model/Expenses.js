@@ -39,7 +39,7 @@ const expensesSchema = new mongoose.Schema(
       required: true
     },
     walletId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true
     }
   },

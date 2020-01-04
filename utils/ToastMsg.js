@@ -12,9 +12,11 @@ module.exports = {
   qrCodeSuccess: "QR-Code generated successfully",
   userDeleteSuccess: "User deleted successfully",
   userUpdateSuccess: "User updated successfully",
-  walletsFetchSuccess: "All wallets fetched successfully",
+  userFetchSuccess: "User fetched successfully",
 
   // WALLETS
+  walletsFetchSuccess: "All wallets fetched successfully",
+  walletsFetchError: "Wallet not fetched successfully",
   walletCreateSuccess: "Wallet created successfully",
   walletDeleteSuccess: "Wallet deleted successfully",
   walletUpdateSuccess: "Wallet updated successfully",
@@ -22,6 +24,7 @@ module.exports = {
 
   // EXPENSES
   expenseAllSuccess: "All expenses fetched successfully",
+  expenseAllError: "Expenses not fetched!",
   expenseCreateSuccess: "Expenses added successfully",
   expenseUpdateSuccess: "Expenses updated successfully",
   expenseDeletedSuccess: "Expenses deleted successfully",

@@ -1,12 +1,13 @@
 const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
 const User = require("../model/User");
+const Wallets = require("../model/Wallets");
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
 
 //! Controller for New User
 // POST
-exports.register = async (req, res, next) => {
+exports.register = async (req, res) => {
   const { firstName, lastName, email, mobile, password } = req.body;
   try {
     const user = new User({
@@ -26,7 +27,7 @@ exports.register = async (req, res, next) => {
 
 //! Controller for login an existing user
 // POST
-exports.login = async (req, res, next) => {
+exports.login = async (req, res) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
@@ -39,7 +40,7 @@ exports.login = async (req, res, next) => {
 
 //! Controller for updating User info
 // PATCH
-exports.update = async (req, res, next) => {
+exports.update = async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.findByIdAndUpdate(id, req.body, {
@@ -55,7 +56,7 @@ exports.update = async (req, res, next) => {
 
 //! Controller for deleting/removing account of an user
 // Delete
-exports.deleteAcc = async (req, res, next) => {
+exports.deleteAcc = async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.findByIdAndDelete({ _id: id });
@@ -69,7 +70,7 @@ exports.deleteAcc = async (req, res, next) => {
 };
 
 //! For 2-Factor-Authentication
-exports.twoFA = async (req, res, next) => {
+exports.twoFA = async (req, res) => {
   const id = req.params.id;
   const secret = speakeasy.generateSecret({ length: 20 });
   try {
@@ -90,13 +91,43 @@ exports.twoFA = async (req, res, next) => {
 
 //! For Fetching all Wallets associated to that user
 // GET
-exports.allWallets = async (req, res, next) => {
+exports.allWallets = async (req, res) => {
   const id = req.user._id;
   try {
     const user = await User.findById(id);
     if (!user) throw new Error(msg.userNotFound);
     await user.populate("wallets").execPopulate();
     res.send(generateMsg(msg.walletsFetchSuccess, "success", user.wallets));
+  } catch (error) {
+    res.send(generateMsg(null, "error", error));
+  }
+};
+
+//! For getting user info
+//  GET
+exports.getUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id);
+    const userDetails = Object.assign({}, user);
+    const userInfo = userDetails._doc; // * for getting the new object
+
+    // * Delete tokens and password
+    delete userInfo.password;
+    delete userInfo.token;
+    delete userInfo.qrToken;
+
+    // * Fetching all wallets
+    const wallet = await Wallets.find({
+      user: userInfo._id,
+      active: true
+    });
+
+    const activeWallet = wallet[0];
+
+    res.send(
+      generateMsg(msg.userFetchSuccess, "success", { userInfo, activeWallet })
+    );
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }

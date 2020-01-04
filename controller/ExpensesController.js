@@ -1,22 +1,14 @@
 const Expenses = require("../model/Expenses");
-const Wallets = require("../model/Wallets");
-const User = require("../model/User");
 
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
 
 // POST
-exports.add = async (req, res, next) => {
+exports.add = async (req, res) => {
   try {
-    const walletID = req.body.walletId;
-    const expense = new Expenses({ ...req.body });
-    expense.save().then(docDocument => {
-      return Wallets.findByIdAndUpdate(
-        walletID,
-        { $push: { expenses: docDocument._id } },
-        { new: true }
-      );
-    });
+    const walletId = req.body.walletId;
+    const expense = new Expenses({ ...req.body, walletId });
+    await expense.save();
     res.send(generateMsg(msg.expenseCreateSuccess, "success", expense));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
@@ -24,7 +16,7 @@ exports.add = async (req, res, next) => {
 };
 
 // PATCH
-exports.update = async (req, res, next) => {
+exports.update = async (req, res) => {
   try {
     const id = req.params.id;
     const expense = await Expenses.findByIdAndUpdate(id, req.body, {
@@ -38,7 +30,7 @@ exports.update = async (req, res, next) => {
 };
 
 // DELETE
-exports.delete = async (req, res, next) => {
+exports.delete = async (req, res) => {
   try {
     const id = req.params.id;
     await Expenses.findByIdAndDelete(id);
@@ -55,19 +47,13 @@ exports.delete = async (req, res, next) => {
 };
 
 // GET
-exports.all = async (req, res, next) => {
+exports.getExpense = async (req, res) => {
   try {
-    const id = req.user._id;
-    const user = await User.findById(id);
-    console.log(user);
-    if (!user) throw new Error(msg.userNotFound);
-    const expenses = await Expenses.find({
-      walletId: {
-        $eq: user.activeWallet
-      }
-    });
-    res.send(generateMsg(msg.expenseAllSuccess, "success", expenses));
+    const id = req.params.id;
+    const expense = await Expenses.findById(id);
+    if (!expense) throw new Error(msg.expenseAllError);
+    res.send(generateMsg(msg.expenseAllSuccess, "success", expense));
   } catch (error) {
-    res.send(null, "error", error);
+    res.send(generateMsg(null, "error", error));
   }
 };
