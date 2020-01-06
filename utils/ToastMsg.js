@@ -28,5 +28,11 @@ module.exports = {
   expenseCreateSuccess: "Expenses added successfully",
   expenseUpdateSuccess: "Expenses updated successfully",
   expenseDeletedSuccess: "Expenses deleted successfully",
-  expenseCreateError: "Expenses not added"
+  expenseCreateError: "Expenses not added",
+
+  // Filter
+  filterAppliedSuccess: "Filter is applied successfully",
+  filterAppliedError: "No record found!",
+  searchFoundSuccess: "Result found successfully",
+  searchFoundError: " No result found!"
 };

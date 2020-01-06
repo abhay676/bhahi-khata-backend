@@ -12,8 +12,9 @@ const auth = require("./middleware/Auth");
 const loginController = require("./controller/UserController");
 const walletsController = require("./controller/WalletsController");
 const expensesController = require("./controller/ExpensesController");
+const filterController = require("./controller/FilterController");
 
-// LOGIN routes
+// ! LOGIN routes
 router.post("/login", loginController.login);
 router.post("/register", loginController.register);
 router.patch("/user/update/:id", auth, loginController.update);
@@ -22,18 +23,30 @@ router.post("/user/2fa/:id", auth, loginController.twoFA);
 router.get("/user/wallets", auth, loginController.allWallets);
 router.get("/user/:id", auth, loginController.getUser);
 
-// WALLETS routes
+// ! WALLETS routes
 router.post("/api/wallets/add", auth, walletsController.add);
 router.patch("/api/wallets/update/:id", auth, walletsController.update);
 router.delete("/api/wallets/delete/:id", auth, walletsController.delete);
 router.get("/api/wallet/:id", auth, walletsController.getWallet);
+
 // ? Fetch All expenses for a particular Wallet
 router.get("/api/expenses/:walletId", auth, walletsController.walletExpenses);
 
-// EXPENSES routes
+// ! EXPENSES routes
 router.post("/api/expenses/add", auth, expensesController.add);
 router.patch("/api/expenses/update/:id", auth, expensesController.update);
 router.delete("/api/expenses/delet/:id", auth, expensesController.delete);
 router.get("/api/expense/:id", auth, expensesController.getExpense);
 
+// ? Filter routes
+router.get(
+  "/api/expenses/filter/:walletId",
+  auth,
+  filterController.sortExpenses
+);
+router.get(
+  "/api/expenses/search/:walletId",
+  auth,
+  filterController.searchExpenses
+);
 module.exports = router;
