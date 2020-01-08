@@ -6,4 +6,5 @@
 - PDF generation
 - Mail service
 - Notification `[HOLD]`
-- Redis implementation
+- Forgot password
+
