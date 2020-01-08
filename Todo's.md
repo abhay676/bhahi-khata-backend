@@ -4,7 +4,6 @@
 - Budget Controller and its Model
 - Photo Upload
 - PDF generation
-- Mail service
+- Mail service `[newUser, Delete Account]`
 - Notification `[HOLD]`
 - Forgot password
-
