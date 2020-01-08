@@ -2,6 +2,7 @@ const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
 const User = require("../model/User");
 const Wallets = require("../model/Wallets");
+const sendMail = require("../utils/sendMail");
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
 
@@ -19,6 +20,15 @@ exports.register = async (req, res) => {
     });
     await user.generateToken();
     await user.save();
+    // Send welcome mail
+    const mailObj = {
+      to: user.email,
+      from: process.env.MAIL_ADD,
+      subject: `Welcome Mr.${user.lastName}✌ to our Family👪`,
+      text: "Bhahi-khata",
+      type: "WelcomeMail"
+    };
+    sendMail(mailObj);
     res.send(generateMsg(msg.loginSuccess, "success", user));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
@@ -61,6 +71,15 @@ exports.deleteAcc = async (req, res) => {
     const id = req.params.id;
     const user = await User.findByIdAndDelete({ _id: id });
     if (!user) throw new Error(msg.userNotFound);
+    // Send a mail
+    const mailObj = {
+      to: user.email,
+      from: process.env.MAIL_ADD,
+      subject: `Sorry! 😭 Mr.${user.lastName}`,
+      text: "Bhahi-khata",
+      type: "ThankUMail"
+    };
+    sendMail(mailObj);
     res.send(
       generateMsg(msg.userDeleteSuccess, "success", msg.userDeleteSuccess)
     );
