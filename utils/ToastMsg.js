@@ -34,5 +34,9 @@ module.exports = {
   filterAppliedSuccess: "Filter is applied successfully",
   filterAppliedError: "No record found!",
   searchFoundSuccess: "Result found successfully",
-  searchFoundError: " No result found!"
+  searchFoundError: " No result found!",
+
+  // REPORT
+  reportGenSuccess: "Report generated successfully",
+  reportGenError: "Report is not able to Generate"
 };

@@ -42,7 +42,12 @@ const walletsSchema = new mongoose.Schema(
     budget: {
       type: Number,
       default: null
-    }
+    },
+    reports: [
+      {
+        type: String
+      }
+    ]
   },
   {
     timestamps: true
