@@ -29,7 +29,7 @@ const walletsSchema = new mongoose.Schema(
     },
     active: {
       type: Boolean,
-      default: null
+      default: false
     },
     icon: {
       type: String
@@ -42,6 +42,15 @@ const walletsSchema = new mongoose.Schema(
     budget: {
       type: Number,
       default: null
+    },
+    reports: [
+      {
+        type: Object
+      }
+    ],
+    freeze: {
+      type: Boolean,
+      default: false
     }
   },
   {

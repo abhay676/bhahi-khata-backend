@@ -13,6 +13,7 @@ const loginController = require("./controller/UserController");
 const walletsController = require("./controller/WalletsController");
 const expensesController = require("./controller/ExpensesController");
 const filterController = require("./controller/FilterController");
+const ReportController = require("./controller/ReportController");
 
 // ! LOGIN routes
 router.post("/login", loginController.login);
@@ -31,6 +32,8 @@ router.get("/api/wallet/:id", auth, walletsController.getWallet);
 
 // ? Fetch All expenses for a particular Wallet
 router.get("/api/expenses/:walletId", auth, walletsController.walletExpenses);
+// Freeze wallet
+router.get("/api/freezeWallet/:walletId", auth, walletsController.freezeWallet);
 
 // ! EXPENSES routes
 router.post("/api/expenses/add", auth, expensesController.add);
@@ -49,4 +52,8 @@ router.get(
   auth,
   filterController.searchExpenses
 );
+
+// Report Generation
+router.get("/api/gnReport/:walletId", auth, ReportController.generatePDF);
+
 module.exports = router;

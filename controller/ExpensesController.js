@@ -1,4 +1,5 @@
 const Expenses = require("../model/Expenses");
+const Wallets = require("../model/Wallets");
 
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
@@ -7,9 +8,18 @@ const msg = require("../utils/ToastMsg");
 exports.add = async (req, res) => {
   try {
     const walletId = req.body.walletId;
-    const expense = new Expenses({ ...req.body, walletId });
-    await expense.save();
-    res.send(generateMsg(msg.expenseCreateSuccess, "success", expense));
+    const walletInfo = await Wallets.findById({ _id: walletId });
+    if (walletInfo.freeze) {
+      res.send(
+        generateMsg(msg.freezeWalletExpense, "error", msg.freezeWalletExpense)
+      );
+    }
+    if (walletInfo.active) {
+      const expense = new Expenses({ ...req.body, walletId });
+      await expense.save();
+      res.send(generateMsg(msg.expenseCreateSuccess, "success", expense));
+    }
+    res.send(generateMsg(msg.expensesAddError, "error", msg.expensesAddError));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }
