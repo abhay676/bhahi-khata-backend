@@ -32,6 +32,8 @@ router.get("/api/wallet/:id", auth, walletsController.getWallet);
 
 // ? Fetch All expenses for a particular Wallet
 router.get("/api/expenses/:walletId", auth, walletsController.walletExpenses);
+// Freeze wallet
+router.get("/api/freezeWallet/:walletId", auth, walletsController.freezeWallet);
 
 // ! EXPENSES routes
 router.post("/api/expenses/add", auth, expensesController.add);

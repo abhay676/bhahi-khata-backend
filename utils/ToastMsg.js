@@ -21,6 +21,7 @@ module.exports = {
   walletDeleteSuccess: "Wallet deleted successfully",
   walletUpdateSuccess: "Wallet updated successfully",
   walletFreeze: "Wallet is freezed",
+  walletFreezeExist: "Wallet is already freezed",
 
   // EXPENSES
   expenseAllSuccess: "All expenses fetched successfully",
@@ -29,6 +30,8 @@ module.exports = {
   expenseUpdateSuccess: "Expenses updated successfully",
   expenseDeletedSuccess: "Expenses deleted successfully",
   expenseCreateError: "Expenses not added",
+  expensesAddError: "Wallet is not Active",
+  freezeWalletExpense: "Wallet is Freezed!",
 
   // Filter
   filterAppliedSuccess: "Filter is applied successfully",

@@ -55,6 +55,11 @@ exports.walletExpenses = async (req, res) => {
     const walletId = req.params.walletId;
     const expenses = await Wallets.findById(walletId);
     if (!expenses) throw new Error(msg.expenseAllError);
+    if (expenses.freeze) {
+      return res.send(
+        generateMsg(msg.freezeWalletExpense, "error", msg.freezeWalletExpense)
+      );
+    }
     await expenses.populate("transactions").execPopulate();
     res.send(
       generateMsg(msg.expenseAllSuccess, "success", expenses.transactions)
@@ -72,6 +77,33 @@ exports.getWallet = async (req, res) => {
     const wallet = await Wallets.find(id);
     if (!wallet) throw new Error(msg.walletsFetchError);
     res.send(generateMsg(msg.walletsFetchSuccess, "success", wallet));
+  } catch (error) {
+    res.send(generateMsg(null, "error", error));
+  }
+};
+
+// Freeze
+// GET
+exports.freezeWallet = async (req, res) => {
+  try {
+    const walletId = req.params.walletId;
+    const walletInfo = await Wallets.findById({ _id: walletId });
+    if (walletInfo.freeze) {
+      return res.send(
+        generateMsg(msg.walletFreezeExist, "error", msg.walletFreezeExist)
+      );
+    }
+    const wallet = await Wallets.updateOne(
+      { _id: walletId },
+      {
+        $set: {
+          freeze: true,
+          active: false
+        }
+      }
+    );
+    if (!wallet) throw new Error(msg.walletsFetchError);
+    res.send(generateMsg(msg.walletFreeze, "success", wallet));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }

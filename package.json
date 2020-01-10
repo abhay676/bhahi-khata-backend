@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abhay676/bhahi-khata-backend.git"
+    "url": "git+https://gitlab.com/abhay676/bhahi-khata-backend.git"
   },
   "author": "Abhay Goswami",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/abhay676/bhahi-khata-backend/issues"
+    "url": "https://gitlab.com/abhay676/bhahi-khata-backend/issues"
   },
-  "homepage": "https://github.com/abhay676/bhahi-khata-backend#readme",
+  "homepage": "https://gitlab.com/abhay676/bhahi-khata-backend#readme",
   "dependencies": {
     "@sendgrid/mail": "^6.4.0",
     "bcryptjs": "^2.4.3",

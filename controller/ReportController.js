@@ -70,15 +70,18 @@ exports.generatePDF = async (req, res) => {
     const fromDate = moment(from).format("L");
     const toDate = moment(to).format("L");
 
-    // TODO: Store meta-data of PDF into the wallet-collection
     const userInforTop = 200;
     const doc = new PDFDocument();
-    doc.info = {
+
+    const reportMetaData = {
       Title: "Report Summary",
-      Author: `${user.lastName}`,
+      Author: `${user.firstName} ${user.lastName}`,
       Subject: `Summary of ${walletName.name}`,
-      Keywords: reportId
+      Keywords: reportId,
+      ModDate: moment().format("L")
     };
+
+    doc.info = reportMetaData;
     // Generate Header
     doc
       .text("Bhahi-Khata Summary", 200, 65, {
@@ -164,11 +167,9 @@ exports.generatePDF = async (req, res) => {
     doc.pipe(fs.createWriteStream(`${reportId}.pdf`));
     await Wallet.findByIdAndUpdate(walletId, {
       $push: {
-        reports: reportId
+        reports: reportMetaData
       }
     });
-
-    //TODO: Store Report on Cloud platform
     res.send(msg.reportGenSuccess, "success", msg.reportGenSuccess);
   } catch (error) {
     res.send(generateMsg(null, "error", error));

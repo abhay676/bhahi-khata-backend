@@ -56,3 +56,5 @@ node_modules/
 .env
 .env.test
 
+# Reports i.e PDF
+*.pdf
