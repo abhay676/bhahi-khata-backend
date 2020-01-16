@@ -7,7 +7,7 @@ const msg = require("../utils/ToastMsg");
 
 const userSchema = new mongoose.Schema(
   {
-    userImage: {
+    avatar: {
       type: String
     },
     firstName: {

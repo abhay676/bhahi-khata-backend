@@ -11,6 +11,12 @@ const msg = require("../utils/ToastMsg");
 exports.register = async (req, res) => {
   const { firstName, lastName, email, mobile, password } = req.body;
   try {
+    const mailRegister = await User.find({ email });
+    if (mailRegister.length) {
+      return res.send(
+        generateMsg(msg.duplicationError, "error", msg.duplicationError)
+      );
+    }
     const user = new User({
       firstName,
       lastName,
@@ -18,6 +24,7 @@ exports.register = async (req, res) => {
       mobile,
       password
     });
+
     await user.generateToken();
     await user.save();
     // Send welcome mail
@@ -29,7 +36,7 @@ exports.register = async (req, res) => {
       type: "WelcomeMail"
     };
     sendMail(mailObj);
-    res.send(generateMsg(msg.loginSuccess, "success", user));
+    res.send(generateMsg(msg.registerSuccess, "success", user));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }
@@ -39,12 +46,19 @@ exports.register = async (req, res) => {
 // POST
 exports.login = async (req, res) => {
   try {
-    const email = req.body.email;
-    const password = req.body.password;
+    const email = req.body.userInfo.email;
+    const password = req.body.userInfo.password;
     const user = await User.findByEmail(email, password);
-    res.send(user);
+    const userDetails = Object.assign({}, user);
+    const userInfo = userDetails._doc; // for getting the new object
+
+    //  Delete and password
+    delete userInfo.password;
+    delete userInfo.updatedAt;
+    delete userInfo.createdAt;
+    res.send(generateMsg(msg.userLoginSuccess, "success", userInfo));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    res.send(generateMsg(msg.userNotFound, "error", error));
   }
 };
 

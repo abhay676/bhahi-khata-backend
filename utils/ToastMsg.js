@@ -6,13 +6,15 @@ module.exports = {
   accessDenied: "Access denied",
   invalidToken: "Token is not valid",
   // User
-  loginSuccess: "User register successfully",
+  registerSuccess: "User register successfully",
   userNotFound: "User not found",
   pwdNotMatch: "Password don't match",
   qrCodeSuccess: "QR-Code generated successfully",
   userDeleteSuccess: "User deleted successfully",
   userUpdateSuccess: "User updated successfully",
   userFetchSuccess: "User fetched successfully",
+  userLoginSuccess: "User login successfully",
+  duplicationError: "Email already registerd",
 
   // WALLETS
   walletsFetchSuccess: "All wallets fetched successfully",
