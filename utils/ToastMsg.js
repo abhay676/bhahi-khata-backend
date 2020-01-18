@@ -13,7 +13,7 @@ module.exports = {
   userDeleteSuccess: "User deleted successfully",
   userUpdateSuccess: "User updated successfully",
   userFetchSuccess: "User fetched successfully",
-  userLoginSuccess: "User login successfully",
+  userLoginSuccess: "Ready to rock🔥",
   duplicationError: "Email already registerd",
 
   // WALLETS
