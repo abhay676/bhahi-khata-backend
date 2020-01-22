@@ -7,7 +7,7 @@ module.exports = {
   invalidToken: "Token is not valid",
   // User
   registerSuccess: "User register successfully",
-  userNotFound: "User not found",
+  userNotFound: "Email/Password may be wrong",
   pwdNotMatch: "Password don't match",
   qrCodeSuccess: "QR-Code generated successfully",
   userDeleteSuccess: "User deleted successfully",
