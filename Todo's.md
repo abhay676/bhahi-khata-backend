@@ -3,7 +3,7 @@
 - API for filters `[Search, Sort]`
 - Budget Controller and its Model
 - Photo Upload
-- PDF generation
+- PDF generation `[ DONE ]`
 - Mail service `[newUser, Delete Account]`
 - Notification `[HOLD]`
 - Forgot password

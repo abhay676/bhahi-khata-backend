@@ -46,8 +46,8 @@ exports.register = async (req, res) => {
 // POST
 exports.login = async (req, res) => {
   try {
-    const email = req.body.userInfo.email;
-    const password = req.body.userInfo.password;
+    const email = req.body.email;
+    const password = req.body.password;
     const user = await User.findByEmail(email, password);
     const userDetails = Object.assign({}, user);
     const userInfo = userDetails._doc; // for getting the new object
