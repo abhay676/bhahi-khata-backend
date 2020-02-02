@@ -82,7 +82,7 @@ exports.getWallet = async (req, res) => {
   }
 };
 
-// Freeze
+//! Freeze
 // GET
 exports.freezeWallet = async (req, res) => {
   try {
@@ -104,6 +104,20 @@ exports.freezeWallet = async (req, res) => {
     );
     if (!wallet) throw new Error(msg.walletsFetchError);
     res.send(generateMsg(msg.walletFreeze, "success", wallet));
+  } catch (error) {
+    res.send(generateMsg(null, "error", error));
+  }
+};
+
+//! For Fetching all Wallets associated to that user
+// GET
+exports.allWallets = async (req, res) => {
+  const id = req.user._id;
+  try {
+    const user = await User.findById(id);
+    if (!user) throw new Error(msg.userNotFound);
+    await user.populate("wallets").execPopulate();
+    res.send(generateMsg(msg.walletsFetchSuccess, "success", user.wallets));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }

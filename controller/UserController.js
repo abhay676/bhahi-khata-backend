@@ -5,6 +5,7 @@ const Wallets = require("../model/Wallets");
 const sendMail = require("../utils/sendMail");
 const generateMsg = require("../utils/GenerateMsg");
 const msg = require("../utils/ToastMsg");
+const gravatr = require("../utils/Gravtar");
 
 //! Controller for New User
 // POST
@@ -17,12 +18,15 @@ exports.register = async (req, res) => {
         generateMsg(msg.duplicationError, "error", msg.duplicationError)
       );
     }
+    const avatar = gravatr(email);
+
     const user = new User({
       firstName,
       lastName,
       email,
       mobile,
-      password
+      password,
+      avatar
     });
 
     await user.generateToken();
@@ -117,20 +121,6 @@ exports.twoFA = async (req, res) => {
     );
     if (!user) throw new Error(msg.userNotFound);
     res.send(generateMsg(msg.qrCodeSuccess, "success", user));
-  } catch (error) {
-    res.send(generateMsg(null, "error", error));
-  }
-};
-
-//! For Fetching all Wallets associated to that user
-// GET
-exports.allWallets = async (req, res) => {
-  const id = req.user._id;
-  try {
-    const user = await User.findById(id);
-    if (!user) throw new Error(msg.userNotFound);
-    await user.populate("wallets").execPopulate();
-    res.send(generateMsg(msg.walletsFetchSuccess, "success", user.wallets));
   } catch (error) {
     res.send(generateMsg(null, "error", error));
   }

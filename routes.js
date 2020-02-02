@@ -21,7 +21,6 @@ router.post("/register", loginController.register);
 router.patch("/user/update/:id", auth, loginController.update);
 router.delete("/user/delete/:id", auth, loginController.deleteAcc);
 router.post("/user/2fa/:id", auth, loginController.twoFA);
-router.get("/user/wallets", auth, loginController.allWallets);
 router.get("/user/:id", auth, loginController.getUser);
 
 // ! WALLETS routes
@@ -29,6 +28,7 @@ router.post("/api/wallets/add", auth, walletsController.add);
 router.patch("/api/wallets/update/:id", auth, walletsController.update);
 router.delete("/api/wallets/delete/:id", auth, walletsController.delete);
 router.get("/api/wallet/:id", auth, walletsController.getWallet);
+router.get("/api/wallets", auth, walletsController.allWallets);
 
 // ? Fetch All expenses for a particular Wallet
 router.get("/api/expenses/:walletId", auth, walletsController.walletExpenses);
