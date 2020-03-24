@@ -34,7 +34,8 @@
     "qrcode": "^1.4.4",
     "speakeasy": "^2.0.0",
     "uniqid": "^5.2.0",
-    "validator": "^12.1.0"
+    "validator": "^12.1.0",
+    "winston": "^3.2.1"
   },
   "husky": {
     "hooks": {
@@ -44,7 +45,8 @@
   "lint-staged": {
     "./src/*.{js,jsx,ts,tsx}": [
       "eslint src/*.js --fix-dry-run"
-    ]
+    ],
+    "*.js": "eslint --cache --fix"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
@@ -53,9 +55,8 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "husky": "^3.1.0",
-    "lint-staged": "^9.5.0",
-    "nodemon": "^2.0.2",
-    "prettier": "1.19.1"
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.9",
+    "nodemon": "^2.0.2"
   }
 }

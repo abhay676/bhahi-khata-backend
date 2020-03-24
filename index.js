@@ -4,6 +4,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 require("dotenv").config();
 
+const logger = require("./utils/Winston");
+
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_API, credentials: true }));
 app.use(helmet());
@@ -16,5 +18,5 @@ const routes = require("./routes");
 app.use(routes);
 
 app.listen(8000, () => {
-  console.log("Server is running on PORT 8000");
+  logger.info("Server is running on PORT 8000")
 });
