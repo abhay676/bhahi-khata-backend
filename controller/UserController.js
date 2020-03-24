@@ -55,7 +55,6 @@ exports.login = async (req, res) => {
     const user = await User.findByEmail(email, password);
     const userDetails = Object.assign({}, user);
     const userInfo = userDetails._doc; // for getting the new object
-
     //  Delete and password
     delete userInfo.password;
     delete userInfo.updatedAt;
