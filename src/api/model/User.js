@@ -3,6 +3,7 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const msg = require("../../services/ToastMsg");
+const config = require("../../config")
 
 const userSchema = new mongoose.Schema(
   {
@@ -109,7 +110,7 @@ userSchema.methods.generateToken = async function() {
   const user = this;
   const token = await jwt.sign(
     { _id: user._id.toString() },
-    process.env.SECRET_KEY
+    config.SECRET_kEY
   );
   user.token = token;
 };
