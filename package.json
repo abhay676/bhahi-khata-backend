@@ -27,7 +27,6 @@
     "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
-    "mongodb": "^3.4.1",
     "mongoose": "^5.8.3",
     "pdfkit": "^0.11.0",
     "qrcode": "^1.4.4",
