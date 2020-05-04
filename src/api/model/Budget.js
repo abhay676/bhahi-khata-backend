@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-require("../db");
 
 const budgetSchema = new mongoose.Schema(
   {
