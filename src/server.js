@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 // Routes imports
 const routes = require("./routes");
 
-app.use(routes);
+app.use("/api", routes);
 
 app.listen(8000, () => {
   logger.info("Server is running on PORT 8000")

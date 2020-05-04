@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const generateMsg = require("../utils/GenerateMsg");
-const msg = require("../utils/ToastMsg");
+const generateMsg = require("../../utils/GenerateMsg");
+const msg = require("../../utils/ToastMsg");
 
 module.exports = async (req, res, next) => {
   const bearerHeader =

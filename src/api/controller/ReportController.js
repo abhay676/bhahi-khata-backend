@@ -2,13 +2,13 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const moment = require("moment");
 const uid = require("uniqid");
-const generateMsg = require("../utils/GenerateMsg");
-const msg = require("../utils/ToastMsg");
+const generateMsg = require("../../utils/GenerateMsg");
+const msg = require("../../utils/ToastMsg");
 const User = require("../model/User");
 const Wallet = require("../model/Wallets");
 const Expenses = require("../model/Expenses");
 
-function generateTableRow(doc, y, c1, c2, c3, c4, c5) {
+function generateTableRow (doc, y, c1, c2, c3, c4, c5) {
   if (typeof c5 === "string") {
     c5 = "Date";
   } else {
