@@ -28,6 +28,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
     "mongoose": "^5.8.3",
+    "morgan": "^1.10.0",
     "pdfkit": "^0.11.0",
     "qrcode": "^1.4.4",
     "speakeasy": "^2.0.0",

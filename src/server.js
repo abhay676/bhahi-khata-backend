@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const helmet = require("helmet");
+const morgan = require("morgan")
 require("dotenv").config();
 
 const logger = require("./utils/Winston");
@@ -11,6 +12,7 @@ app.use(cors({ origin: process.env.FRONTEND_API, credentials: true }));
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(morgan("dev"))
 
 // Routes imports
 const routes = require("./routes");
