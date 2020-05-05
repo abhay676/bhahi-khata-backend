@@ -17,6 +17,7 @@ describe("Unit test-cases for User Controller", () => {
   afterAll(async () => {
     // Removes the User collection
     await User.deleteMany();
+    await mongoose.connection.dropDatabase()
     await mongoose.connection.close();
   });
 
@@ -30,16 +31,14 @@ describe("Unit test-cases for User Controller", () => {
       password: "Abhay123#"
     };
     // Pass data to the User constructor
-    const user = new User(mockUserData);
-    await user.generateToken();
-    // Check isNew is False
-    user
-      .save()
-      .then(() => {
-        assert(!user.isNew);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    try {
+      const user = new User(mockUserData);
+      await user.generateToken();
+      // Check isNew is False
+      const savedUser = await user.save();
+      assert(!savedUser.isNew)
+    } catch (error) {
+      console.log(error)
+    }
   });
 });

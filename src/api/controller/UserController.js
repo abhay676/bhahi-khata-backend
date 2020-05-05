@@ -2,47 +2,24 @@ const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
 const User = require("../model/User");
 const Wallets = require("../model/Wallets");
-const sendMail = require("../utils/sendMail");
-const generateMsg = require("../utils/GenerateMsg");
-const msg = require("../utils/ToastMsg");
-const gravatr = require("../utils/Gravtar");
+const sendMail = require("../../services/sendMail");
+const generateMsg = require("../../services/GenerateMsg");
+const msg = require("../../services/ToastMsg");
+// const { ErrorHandler } = require("../../services/ErrorHandler");
 
-//! Controller for New User
-// POST
-exports.register = async (req, res) => {
-  const { firstName, lastName, email, mobile, password } = req.body;
+// TODO: 1. Mail service using Nodemailer with custom templates
+
+exports.register = async (req, res, next) => {
   try {
-    const mailRegister = await User.find({ email });
-    if (mailRegister.length) {
-      return res.send(
-        generateMsg(msg.duplicationError, "error", msg.duplicationError)
-      );
-    }
-    const avatar = gravatr(email);
-
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      mobile,
-      password,
-      avatar
-    });
-
-    await user.generateToken();
-    await user.save();
-    // Send welcome mail
-    const mailObj = {
-      to: user.email,
-      from: process.env.MAIL_ADD,
-      subject: `Welcome Mr.${user.lastName}✌ to our Family👪`,
-      text: "Bhahi-khata",
-      type: "WelcomeMail"
-    };
-    sendMail(mailObj);
-    res.send(generateMsg(msg.registerSuccess, "success", user));
+    const newUser = new User(req.body);
+    await newUser.save();
+    await newUser.generateToken();
+    res.send(newUser.userInfo())
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    if (!error.code) {
+      error.code = 401;
+    }
+    next(error);
   }
 };
 
