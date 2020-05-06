@@ -2,7 +2,6 @@ const speakeasy = require("speakeasy");
 const qrcode = require("qrcode");
 const User = require("../model/User");
 const Wallets = require("../model/Wallets");
-const sendMail = require("../../services/sendMail");
 const generateMsg = require("../../services/GenerateMsg");
 const msg = require("../../services/ToastMsg");
 const { ErrorHandler } = require("../../services/ErrorHandler");
@@ -25,11 +24,9 @@ exports.login = async (req, res, next) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
-    // const user = await User.findByEmail(email, password);
     const user = await User.findOne({ email });
     if (!user) throw new ErrorHandler(404, "User not found");
     const isMatch = await user.comparePwd(password);
-    console.log(isMatch)
     if (!isMatch) throw new ErrorHandler(404, "Password don't match");
     res.send(user.userInfo());
   } catch (error) {
@@ -38,47 +35,29 @@ exports.login = async (req, res, next) => {
   }
 };
 
-//! Controller for updating User info
-// PATCH
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const user = await User.findByIdAndUpdate(id, req.body, {
+    await User.findByIdAndUpdate(req.user, req.body, {
       new: true,
       runValidators: true
     });
-    if (!user) throw new Error(msg.userNotFound);
-    res.send(generateMsg(msg.userUpdateSuccess, "success", user));
+    res.send({ success: true, code: 200, message: "updated" });
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 404;
+    next(error);
   }
 };
 
-//! Controller for deleting/removing account of an user
 // Delete
-exports.deleteAcc = async (req, res) => {
+exports.deleteAcc = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const user = await User.findByIdAndDelete({ _id: id });
-    if (!user) throw new Error(msg.userNotFound);
-    // Send a mail
-    const mailObj = {
-      to: user.email,
-      from: process.env.MAIL_ADD,
-      subject: `Sorry! 😭 Mr.${user.lastName}`,
-      text: "Bhahi-khata",
-      type: "ThankUMail"
-    };
-    sendMail(mailObj);
-    res.send(
-      generateMsg(msg.userDeleteSuccess, "success", msg.userDeleteSuccess)
-    );
+    await User.findByIdAndDelete({ _id: req.user });
+    res.send({ success: true, code: 200, message: "Deleted" });
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    next(error);
   }
 };
 
-//! For 2-Factor-Authentication
 exports.twoFA = async (req, res) => {
   const id = req.params.id;
   const secret = speakeasy.generateSecret({ length: 20 });
@@ -98,8 +77,6 @@ exports.twoFA = async (req, res) => {
   }
 };
 
-//! For getting user info
-//  GET
 exports.getUser = async (req, res) => {
   try {
     const id = req.params.id;
