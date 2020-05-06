@@ -1,7 +1,7 @@
 const Wallets = require("../model/Wallets");
 const User = require("../model/User");
-const generateMsg = require("../utils/GenerateMsg");
-const msg = require("../utils/ToastMsg");
+// const generateMsg = require("../utils/GenerateMsg");
+// const msg = require("../utils/ToastMsg");
 
 // ! For creating new wallet
 //* POST
