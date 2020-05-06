@@ -5,16 +5,14 @@ const Wallets = require("../model/Wallets");
 const sendMail = require("../../services/sendMail");
 const generateMsg = require("../../services/GenerateMsg");
 const msg = require("../../services/ToastMsg");
-// const { ErrorHandler } = require("../../services/ErrorHandler");
-
-// TODO: 1. Mail service using Nodemailer with custom templates
+const { ErrorHandler } = require("../../services/ErrorHandler");
 
 exports.register = async (req, res, next) => {
   try {
     const newUser = new User(req.body);
     await newUser.save();
     await newUser.generateToken();
-    res.send(newUser.userInfo())
+    res.send(newUser.userInfo());
   } catch (error) {
     if (!error.code) {
       error.code = 401;
@@ -23,22 +21,20 @@ exports.register = async (req, res, next) => {
   }
 };
 
-//! Controller for login an existing user
-// POST
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
-    const user = await User.findByEmail(email, password);
-    const userDetails = Object.assign({}, user);
-    const userInfo = userDetails._doc; // for getting the new object
-    //  Delete and password
-    delete userInfo.password;
-    delete userInfo.updatedAt;
-    delete userInfo.createdAt;
-    res.send(generateMsg(msg.userLoginSuccess, "success", userInfo));
+    // const user = await User.findByEmail(email, password);
+    const user = await User.findOne({ email });
+    if (!user) throw new ErrorHandler(404, "User not found");
+    const isMatch = await user.comparePwd(password);
+    console.log(isMatch)
+    if (!isMatch) throw new ErrorHandler(404, "Password don't match");
+    res.send(user.userInfo());
   } catch (error) {
-    res.send(generateMsg(msg.userNotFound, "error", error));
+    error.code = 404;
+    next(error);
   }
 };
 

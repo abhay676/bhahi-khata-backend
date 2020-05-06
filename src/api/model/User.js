@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const uniqueId = require("uniqid")
 const jwt = require("jsonwebtoken");
-const msg = require("../../services/ToastMsg");
 const config = require("../../config");
 const Gravatar = require("../../services/Gravtar");
-
+const { ErrorHandler } = require("../../services/ErrorHandler")
 const userSchema = new mongoose.Schema(
   {
     userId: {
@@ -56,7 +55,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: mongoose.SchemaTypes.String,
-      required: true
+      required: true,
+      trim: true
     },
     userType: {
       type: mongoose.SchemaTypes.String,
@@ -99,32 +99,23 @@ userSchema.virtual("wallets", {
 userSchema.pre("save", async function(next) {
   const user = this;
   try {
-    const pwd = await bcrypt.hash(user.password, 8);
-    user.password = pwd;
+    if (user.isModified('password')) {
+      const pwd = await bcrypt.hash(user.password, 10);
+      user.password = pwd;
+    }
     user.gravatar = await Gravatar(user.email);
     user.userId = await uniqueId.time()
+    next()
   } catch (error) {
-    throw new Error(error);
+    throw new ErrorHandler(error);
   }
   next();
 });
 
-userSchema.statics.findByEmail = async function(email, password) {
-  try {
-    const isValid = await User.findOne({ email });
-    if (isValid) {
-      const pwd = await bcrypt.compare(password, isValid.password);
-      if (pwd) {
-        return isValid;
-      } else {
-        throw new Error(msg.pwdNotMatch);
-      }
-    }
-    throw new Error(msg.userNotFound);
-  } catch (error) {
-    throw new Error(error);
-  }
-};
+userSchema.methods.comparePwd = async function(pwd) {
+  const isMatch = await bcrypt.compare(pwd, this.password)
+  return isMatch
+}
 
 // Generate JWT token
 userSchema.methods.generateToken = async function() {
