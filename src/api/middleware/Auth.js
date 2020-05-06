@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const generateMsg = require("../../utils/GenerateMsg");
-const msg = require("../../utils/ToastMsg");
+const generateMsg = require("../../services/GenerateMsg");
+const msg = require("../../services/ToastMsg");
 
 module.exports = async (req, res, next) => {
   const bearerHeader =
@@ -11,9 +11,11 @@ module.exports = async (req, res, next) => {
   try {
     const token = bearerHeader.replace("Bearer ", "");
     const verify = await jwt.verify(token, process.env.SECRET_KEY);
-    req.user = verify;
+    req.user = verify._id;
     next();
   } catch (error) {
-    res.send(generateMsg("Permission error", "error", error));
+    res
+      .status(403)
+      .send({ success: false, code: 403, error: "Permission denied" });
   }
 };
