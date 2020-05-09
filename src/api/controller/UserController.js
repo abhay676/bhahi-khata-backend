@@ -1,17 +1,14 @@
-const speakeasy = require("speakeasy");
-const qrcode = require("qrcode");
+const speakeasy = require("speakeasy"); //! On-hold ( has to be reviewd again )
+const qrcode = require("qrcode"); //! On-hold ( has to be reviewed again )
 const User = require("../model/User");
-const Wallets = require("../model/Wallets");
-const generateMsg = require("../../services/GenerateMsg");
-const msg = require("../../services/ToastMsg");
-const { ErrorHandler } = require("../../services/ErrorHandler");
+const { ErrorHandler, Responsehandler } = require("../../services/Handler");
 
 exports.register = async (req, res, next) => {
   try {
     const newUser = new User(req.body);
     await newUser.save();
     await newUser.generateToken();
-    res.send(newUser.userInfo());
+    res.send(Responsehandler(newUser.userInfo()));
   } catch (error) {
     if (!error.code) {
       error.code = 401;
@@ -28,7 +25,8 @@ exports.login = async (req, res, next) => {
     if (!user) throw new ErrorHandler(404, "User not found");
     const isMatch = await user.comparePwd(password);
     if (!isMatch) throw new ErrorHandler(404, "Password don't match");
-    res.send(user.userInfo());
+    await user.generateToken();
+    res.send(Responsehandler(user.userInfo()));
   } catch (error) {
     error.code = 404;
     next(error);
@@ -37,11 +35,12 @@ exports.login = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    await User.findByIdAndUpdate(req.user, req.body, {
+    const data = req.body;
+    await User.findByIdAndUpdate(req.user, data, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
-    res.send({ success: true, code: 200, message: "updated" });
+    res.send(Responsehandler("Updated"));
   } catch (error) {
     error.code = 404;
     next(error);
@@ -52,55 +51,37 @@ exports.update = async (req, res, next) => {
 exports.deleteAcc = async (req, res, next) => {
   try {
     await User.findByIdAndDelete({ _id: req.user });
-    res.send({ success: true, code: 200, message: "Deleted" });
+    res.send(Responsehandler("Deleted"));
   } catch (error) {
     next(error);
   }
 };
 
-exports.twoFA = async (req, res) => {
-  const id = req.params.id;
-  const secret = speakeasy.generateSecret({ length: 20 });
+// exports.twoFA = async (req, res) => {
+//   const id = req.params.id;
+//   const secret = speakeasy.generateSecret({ length: 20 });
+//   try {
+//     const image = await qrcode.toDataURL(secret.base32);
+//     if (!image) {
+//     }
+//     const user = await User.findByIdAndUpdate(
+//       id,
+//       { secretToken: secret.base32, qrCode: image },
+//       { new: true }
+//     );
+//     if (!user) throw new Error(msg.userNotFound);
+//     res.send(generateMsg(msg.qrCodeSuccess, "success", user));
+//   } catch (error) {
+//     res.send(generateMsg(null, "error", error));
+//   }
+// };
+
+exports.getUser = async (req, res, next) => {
   try {
-    const image = await qrcode.toDataURL(secret.base32);
-    if (!image) {
-    }
-    const user = await User.findByIdAndUpdate(
-      id,
-      { secretToken: secret.base32, qrCode: image },
-      { new: true }
-    );
-    if (!user) throw new Error(msg.userNotFound);
-    res.send(generateMsg(msg.qrCodeSuccess, "success", user));
+    const user = await User.findById(req.user);
+    res.send(Responsehandler(user.userInfo()));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
-  }
-};
-
-exports.getUser = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const user = await User.findById(id);
-    const userDetails = Object.assign({}, user);
-    const userInfo = userDetails._doc; // * for getting the new object
-
-    // * Delete tokens and password
-    delete userInfo.password;
-    delete userInfo.token;
-    delete userInfo.qrToken;
-
-    // * Fetching all wallets
-    const wallet = await Wallets.find({
-      user: userInfo._id,
-      active: true
-    });
-
-    const activeWallet = wallet[0];
-
-    res.send(
-      generateMsg(msg.userFetchSuccess, "success", { userInfo, activeWallet })
-    );
-  } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 404;
+    next(error);
   }
 };
