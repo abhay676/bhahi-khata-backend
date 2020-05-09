@@ -5,6 +5,16 @@ class ErrorHandler extends Error {
     this.message = message;
   }
 }
+
+const Responsehandler = (data) => {
+  return {
+    success: true,
+    code: 200,
+    data
+  };
+};
+
 module.exports = {
-  ErrorHandler
+  ErrorHandler,
+  Responsehandler
 };
