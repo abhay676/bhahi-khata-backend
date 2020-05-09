@@ -1,12 +1,11 @@
 const jwt = require("jsonwebtoken");
-const generateMsg = require("../../services/GenerateMsg");
-const msg = require("../../services/ToastMsg");
+const { ErrorHandler } = require("../../services/Handler")
 
 module.exports = async (req, res, next) => {
   const bearerHeader =
     req.headers["x-access-token"] || req.headers.authorization;
   if (!bearerHeader) {
-    return res.send(generateMsg("Permission error", "error", msg.accessDenied));
+    throw new ErrorHandler(401, "Token is not found")
   }
   try {
     const token = bearerHeader.replace("Bearer ", "");
