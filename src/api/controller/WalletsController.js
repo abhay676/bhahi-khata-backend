@@ -1,133 +1,103 @@
 const Wallets = require("../model/Wallets");
 const User = require("../model/User");
-// const generateMsg = require("../utils/GenerateMsg");
-// const msg = require("../utils/ToastMsg");
+const { ErrorHandler, Responsehandler } = require("../../services/Handler");
 
-// ! For creating new wallet
-//* POST
-exports.add = async (req, res) => {
-  const id = req.user._id;
+exports.add = async (req, res, next) => {
+  const id = req.user;
   try {
-    const wallet = new Wallets({ ...req.body, user: id });
-    wallet.save().then(() => {
-      return User.findByIdAndUpdate(id, { activeWallet: wallet._id });
+    const wallet = new Wallets({ ...req.body });
+    await User.findById(req.user);
+    wallet.save().then((data) => {
+      res.send(Responsehandler(data));
+      return User.findByIdAndUpdate(id, {
+        $push: { wallets: data },
+      });
     });
-    res.send(wallet);
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 403;
+    next(error);
   }
 };
 
-// ! For Updating an existing wallet
-// PATCH
-exports.update = async (req, res) => {
-  const id = req.params.id;
+exports.update = async (req, res, next) => {
+  const id = req.query.id;
   try {
     const wallet = await Wallets.findByIdAndUpdate(
       id,
       { ...req.body },
       { new: true }
     );
-    res.send(generateMsg(msg.walletUpdateSuccess, "success", wallet));
+    res.send(Responsehandler(wallet.walletInfo()));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 403;
+    next(error);
   }
 };
 
-// ! For Deleting a wallet
-// DELETE
-exports.delete = async (req, res) => {
-  const id = req.params.id;
+exports.delete = async (req, res, next) => {
+  const id = req.query.id;
+  console.log("id: ", req.user)
   try {
-    await Wallets.findByIdAndDelete(id);
-    res.send(
-      generateMsg(msg.walletDeleteSuccess, "success", msg.walletDeleteSuccess)
-    );
+    const d = await Wallets.findByIdAndDelete(id);
+    const user = await User.findById(req.user)
+    console.log(user)
+    res.send(Responsehandler("Deleted"));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 500;
+    next(error);
   }
 };
 
-// ! For fetching expenses
-// GET
-exports.walletExpenses = async (req, res) => {
+// exports.walletExpenses = async (req, res) => {
+//   try {
+//     const walletId = req.params.walletId;
+//     const expenses = await Wallets.findById(walletId);
+//     if (!expenses) throw new Error(msg.expenseAllError);
+//     if (expenses.freeze) {
+//         generateMsg(msg.freezeWalletExpense, "error", msg.freezeWalletExpense)
+//       return res.send(
+//       );
+//     }
+//     await expenses.populate("transactions").execPopulate();
+//     res.send(
+//       generateMsg(msg.expenseAllSuccess, "success", expenses.transactions)
+//     );
+//   } catch (error) {
+//     res.send(generateMsg(null, "error", error));
+//   }
+// };
+
+exports.getWallet = async (req, res, next) => {
   try {
-    const walletId = req.params.walletId;
-    const expenses = await Wallets.findById(walletId);
-    if (!expenses) throw new Error(msg.expenseAllError);
-    if (expenses.freeze) {
-      return res.send(
-        generateMsg(msg.freezeWalletExpense, "error", msg.freezeWalletExpense)
-      );
-    }
-    await expenses.populate("transactions").execPopulate();
-    res.send(
-      generateMsg(msg.expenseAllSuccess, "success", expenses.transactions)
-    );
+    const id = req.query.id;
+    const wallet = await Wallets.findById(id);
+    if (!wallet) throw new ErrorHandler(404, "No wallet found");
+    res.send(Responsehandler(wallet.walletInfo()));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 500;
+    next(error);
   }
 };
 
-// ! For fetching a wallet Info.
-// GET
-exports.getWallet = async (req, res) => {
+exports.freezeWallet = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const wallet = await Wallets.find(id);
-    if (!wallet) throw new Error(msg.walletsFetchError);
-    res.send(generateMsg(msg.walletsFetchSuccess, "success", wallet));
-  } catch (error) {
-    res.send(generateMsg(null, "error", error));
-  }
-};
-
-//! Freeze
-// GET
-exports.freezeWallet = async (req, res) => {
-  try {
-    const walletId = req.params.walletId;
+    const walletId = req.query.id;
     const walletInfo = await Wallets.findById({ _id: walletId });
     if (walletInfo.freeze) {
-      return res.send(
-        generateMsg(msg.walletFreezeExist, "error", msg.walletFreezeExist)
-      );
+      return res.send(Responsehandler("Already freezed"));
     }
     const wallet = await Wallets.updateOne(
       { _id: walletId },
       {
         $set: {
           freeze: true,
-          active: false
-        }
+        },
       }
     );
-    if (!wallet) throw new Error(msg.walletsFetchError);
-    res.send(generateMsg(msg.walletFreeze, "success", wallet));
+    if (!wallet) throw new ErrorHandler(404, "No wallet found");
+    res.send(Responsehandler("Wallet freezed successfully"));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
-  }
-};
-
-//! For Fetching all Wallets associated to that user
-// GET
-exports.allWallets = async (req, res) => {
-  const id = req.user._id;
-  try {
-    const user = await User.findById(id);
-    if (!user) throw new Error(msg.userNotFound);
-    user
-      .populate("wallets")
-      .execPopulate()
-      .then(wallets => {
-        if (wallets.length === 0) {
-          res.send(
-            generateMsg(msg.walletsFetchSuccess, "success", "No wallets")
-          );
-        }
-        res.send(generateMsg(msg.walletsFetchSuccess, "success", user.wallets));
-      });
-  } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 500;
+    next(error);
   }
 };
