@@ -3,7 +3,7 @@ const validator = require("validator");
 
 const expensesSchema = new mongoose.Schema(
   {
-    merchantName: {
+    title: {
       type: String,
       required: true
     },
@@ -14,19 +14,11 @@ const expensesSchema = new mongoose.Schema(
         validator: function(amt) {
           return validator.isNumeric(amt);
         },
-        message: amt => `Invalid expense amount!`
+        message: (amt) => `Invalid expense amount!`
       }
     },
     event: {
       type: String,
-      default: null
-    },
-    location: {
-      type: String,
-      default: null
-    },
-    userDate: {
-      type: Date,
       default: null
     },
     description: {
@@ -42,10 +34,10 @@ const expensesSchema = new mongoose.Schema(
       required: true
     }
   },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 );
+
+expensesSchema.set('versionKey', false);
 
 const Expenses = mongoose.model("Expenses", expensesSchema);
 

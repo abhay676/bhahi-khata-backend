@@ -5,8 +5,7 @@ const walletsSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
-      unique: true
+      required: true
     },
     amount: {
       type: String,
@@ -15,28 +14,15 @@ const walletsSchema = new mongoose.Schema(
         validator: function(amt) {
           return validator.isNumeric(amt);
         },
-        message: amt => `Invalid wallet amount!`
+        message: (amt) => `Invalid wallet amount!`
       }
     },
     currencyType: {
       type: String,
       required: true
     },
-    category: {
-      type: String,
-      required: true
-    },
-    active: {
-      type: Boolean,
-      default: false
-    },
-    icon: {
+    image: {
       type: String
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true
     },
     budget: {
       type: Number,
@@ -47,23 +33,25 @@ const walletsSchema = new mongoose.Schema(
         type: Object
       }
     ],
-    freeze: {
+    isFreezed: {
       type: Boolean,
       default: false
+    },
+    inviteLink: {
+      type: mongoose.SchemaTypes.String
     }
   },
-  {
-    timestamps: true
-  }
+  { timestamps: true }
 );
 
-//* Virtual field of expenses
+walletsSchema.methods.walletInfo = function() {
+  const wallet = this;
+  const walletInfo = wallet.toObject();
+  delete walletInfo.userInfo;
+  return walletInfo;
+};
 
-walletsSchema.virtual("transactions", {
-  ref: "Expenses",
-  localField: "_id",
-  foreignField: "walletId"
-});
+walletsSchema.set('versionKey', false);
 
 const Wallets = mongoose.model("Wallets", walletsSchema);
 

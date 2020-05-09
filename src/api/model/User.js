@@ -5,7 +5,8 @@ const uniqueId = require("uniqid")
 const jwt = require("jsonwebtoken");
 const config = require("../../config");
 const Gravatar = require("../../services/Gravtar");
-const { ErrorHandler } = require("../../services/ErrorHandler")
+const { ErrorHandler } = require("../../services/Handler")
+
 const userSchema = new mongoose.Schema(
   {
     userId: {
@@ -58,26 +59,30 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
-    userType: {
-      type: mongoose.SchemaTypes.String,
-      default: "basic"
+    isVerified: {
+      type: mongoose.SchemaTypes.Boolean,
+      default: false
+    },
+    budget: {
+      amount: {
+        type: mongoose.SchemaTypes.Number
+      },
+      startDate: {
+        type: mongoose.SchemaTypes.Date
+      },
+      endDate: {
+        type: mongoose.SchemaTypes.Date
+      }
     },
     qrToken: {
       type: mongoose.SchemaTypes.String,
       default: null
     },
-    createdAt: {
-      type: mongoose.SchemaTypes.Number,
-      default: Date.now()
-    },
-    updatedAt: {
-      type: mongoose.SchemaTypes.Number,
-      default: Date.now()
-    },
     qrCode: {
       type: mongoose.SchemaTypes.String,
       default: null
     },
+    wallets: [],
     tokens: [
       {
         token: {
@@ -85,16 +90,16 @@ const userSchema = new mongoose.Schema(
           required: true
         }
       }
-    ]
+    ],
+    meta: {
+      source: {
+        type: mongoose.SchemaTypes.String
+      }
+    }
+  }, {
+    timestamps: true
   }
 );
-
-// Wallets virtual field
-userSchema.virtual("wallets", {
-  ref: "Wallets",
-  localField: "_id",
-  foreignField: "user"
-});
 
 userSchema.pre("save", async function(next) {
   const user = this;
@@ -131,7 +136,6 @@ userSchema.methods.userInfo = function() {
   const userInfo = user.toObject()
   delete userInfo._id
   delete userInfo.password
-  delete userInfo._v
   delete userInfo.tokens
   return userInfo
 }
