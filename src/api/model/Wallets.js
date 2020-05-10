@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqueId = require("uniqid")
+const slug = require("slugify")
 
 const walletsSchema = new mongoose.Schema(
   {
+    walletId: {
+      type: mongoose.SchemaTypes.String
+    },
     name: {
       type: String,
       required: true
@@ -33,6 +38,13 @@ const walletsSchema = new mongoose.Schema(
         type: Object
       }
     ],
+    slug: {
+      type: mongoose.SchemaTypes.String
+    },
+    user: {
+      type: mongoose.SchemaTypes.ObjectId,
+      required: true
+    },
     isFreezed: {
       type: Boolean,
       default: false
@@ -43,6 +55,13 @@ const walletsSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+walletsSchema.pre("save", async function(next) {
+  const wallet = this
+  wallet.walletId = await uniqueId.time()
+  wallet.slug = slug(wallet.name)
+  next()
+})
 
 walletsSchema.methods.walletInfo = function() {
   const wallet = this;

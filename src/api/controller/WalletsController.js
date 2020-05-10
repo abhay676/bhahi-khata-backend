@@ -5,12 +5,11 @@ const { ErrorHandler, Responsehandler } = require("../../services/Handler");
 exports.add = async (req, res, next) => {
   const id = req.user;
   try {
-    const wallet = new Wallets({ ...req.body });
-    await User.findById(req.user);
+    const wallet = new Wallets({ ...req.body, user: req.user });
     wallet.save().then((data) => {
       res.send(Responsehandler(data));
       return User.findByIdAndUpdate(id, {
-        $push: { wallets: data },
+        $push: { wallets: data }
       });
     });
   } catch (error) {
@@ -19,12 +18,25 @@ exports.add = async (req, res, next) => {
   }
 };
 
+// Not a good approach
 exports.update = async (req, res, next) => {
   const id = req.query.id;
   try {
-    const wallet = await Wallets.findByIdAndUpdate(
-      id,
+    const wallet = await Wallets.findOneAndUpdate(
+      { walletId: id },
       { ...req.body },
+      { new: true }
+    );
+    // First remove the object
+    await User.findByIdAndUpdate(
+      req.user,
+      { $pull: { wallets: { walletId: id } } },
+      { new: true }
+    );
+    // Added the updated object
+    await User.findByIdAndUpdate(
+      req.user,
+      { $push: { wallets: wallet } },
       { new: true }
     );
     res.send(Responsehandler(wallet.walletInfo()));
@@ -36,11 +48,13 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   const id = req.query.id;
-  console.log("id: ", req.user)
   try {
-    const d = await Wallets.findByIdAndDelete(id);
-    const user = await User.findById(req.user)
-    console.log(user)
+    await Wallets.find({ walletId: id });
+    await User.findByIdAndUpdate(
+      req.user,
+      { $pull: { wallets: { walletId: id } } },
+      { new: true }
+    );
     res.send(Responsehandler("Deleted"));
   } catch (error) {
     error.code = 500;
@@ -81,18 +95,22 @@ exports.getWallet = async (req, res, next) => {
 
 exports.freezeWallet = async (req, res, next) => {
   try {
-    const walletId = req.query.id;
-    const walletInfo = await Wallets.findById({ _id: walletId });
-    if (walletInfo.freeze) {
-      return res.send(Responsehandler("Already freezed"));
+    const id = req.query.id;
+    const walletInfo = await Wallets.findOne({ walletId: id });
+    if (walletInfo.isFreezed) {
+      return res.send(Responsehandler("Wallet is already freezed"));
     }
     const wallet = await Wallets.updateOne(
-      { _id: walletId },
+      { walletId: id },
       {
         $set: {
-          freeze: true,
-        },
+          isFreezed: true
+        }
       }
+    );
+    await User.updateOne(
+      { _id: req.user, "wallets.walletId": id },
+      { $set: { "wallets.$.isFreezed": true } }
     );
     if (!wallet) throw new ErrorHandler(404, "No wallet found");
     res.send(Responsehandler("Wallet freezed successfully"));
