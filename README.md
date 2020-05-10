@@ -1,11 +1,15 @@
 # Bhahi-khata Backend
 
-This `repository` contains all the backend code for the app.
+## About
 
-`How to start the server:`
+Bhahi-khata is an expense manager helps to make your expense count. Helps to automate the rediculous task of managing and keeping track of the monthly and yearly expenses. 
 
-- Clone this repo locally on your machine.
-- Navigate into the folder directory and run `npm install`, to install all the packages locally.
-- run `node index.js` **OR** `nodemon index.js`
 
-Code is maintained by [Abhay Goswami](https://abgoswami.me)
+## Tech-stack used
+
+- Node.js 
+- Express.js
+- MongoDB 
+- Firebase
+
+Code is maintained and owned by @[Abhay Goswami](https://abgoswami.me)
