@@ -63,6 +63,9 @@ const userSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.Boolean,
       default: false
     },
+    category: {
+      type: mongoose.SchemaTypes.ObjectId
+    },
     budget: {
       amount: {
         type: mongoose.SchemaTypes.Number
@@ -82,7 +85,6 @@ const userSchema = new mongoose.Schema(
       type: mongoose.SchemaTypes.String,
       default: null
     },
-    wallets: [],
     tokens: [
       {
         token: {

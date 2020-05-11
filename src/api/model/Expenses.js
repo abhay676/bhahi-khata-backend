@@ -1,8 +1,12 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const uniqid = require("uniqid")
 
 const expensesSchema = new mongoose.Schema(
   {
+    expenseId: {
+      type: mongoose.SchemaTypes.String
+    },
     title: {
       type: String,
       required: true
@@ -30,12 +34,17 @@ const expensesSchema = new mongoose.Schema(
       required: true
     },
     walletId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.String,
       required: true
     }
   },
   { timestamps: true }
 );
+
+expensesSchema.pre("save", async function(next) {
+  this.expenseId = await uniqid.time()
+  next()
+})
 
 expensesSchema.set('versionKey', false);
 
