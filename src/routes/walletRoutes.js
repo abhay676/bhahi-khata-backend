@@ -8,5 +8,6 @@ router.patch("/wallet/update", auth, walletsController.update);
 router.delete("/wallet/delete", auth, walletsController.delete);
 router.get("/wallet", auth, walletsController.getWallet);
 router.get("/wallet/freeze", auth, walletsController.freezeWallet);
+router.get("/wallet/all", auth, walletsController.getAllWallets)
 
 module.exports = router;

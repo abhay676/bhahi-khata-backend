@@ -3,9 +3,10 @@ const router = require("express").Router();
 const expensesController = require("../api/controller/ExpensesController");
 const auth = require("../api/middleware/Auth")
 
-router.post("/api/expenses/add", auth, expensesController.add);
-router.patch("/api/expenses/update/:id", auth, expensesController.update);
-router.delete("/api/expenses/delet/:id", auth, expensesController.delete);
-router.get("/api/expense/:id", auth, expensesController.getExpense);
+router.post("/expense/add", auth, expensesController.add);
+router.patch("/expense/update", auth, expensesController.update);
+router.delete("/expenses/delete", auth, expensesController.delete);
+router.get("/expense", auth, expensesController.getExpense);
+router.get("/expense/all", auth, expensesController.getAllExpenses)
 
 module.exports = router;
