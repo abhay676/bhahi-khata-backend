@@ -57,25 +57,6 @@ exports.deleteAcc = async (req, res, next) => {
   }
 };
 
-// exports.twoFA = async (req, res) => {
-//   const id = req.params.id;
-//   const secret = speakeasy.generateSecret({ length: 20 });
-//   try {
-//     const image = await qrcode.toDataURL(secret.base32);
-//     if (!image) {
-//     }
-//     const user = await User.findByIdAndUpdate(
-//       id,
-//       { secretToken: secret.base32, qrCode: image },
-//       { new: true }
-//     );
-//     if (!user) throw new Error(msg.userNotFound);
-//     res.send(generateMsg(msg.qrCodeSuccess, "success", user));
-//   } catch (error) {
-//     res.send(generateMsg(null, "error", error));
-//   }
-// };
-
 exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user);
