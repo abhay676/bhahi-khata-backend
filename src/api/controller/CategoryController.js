@@ -21,7 +21,8 @@ exports.addCategory = async (req, res, next) => {
     const userCategory = await category.save();
     const updatedInfo = await User.findByIdAndUpdate(
       { _id: user },
-      { $addField: { category: userCategory } }
+      { $set: { category: userCategory._id } },
+      { new: true }
     );
     res.send(Responsehandler(updatedInfo));
   } catch (error) {
@@ -29,12 +30,30 @@ exports.addCategory = async (req, res, next) => {
   }
 };
 
+exports.updateCategory = async (req, res, next) => {
+  try {
+    const categoryId = req.query.id;
+    const updated = await Category.findByIdAndUpdate(
+      categoryId,
+      { ...req.body },
+      { new: true }
+    );
+    res.send(Responsehandler(updated));
+  } catch (error) {
+    error.code = 500;
+    next(error);
+  }
+};
+
 exports.deleteCategory = async (req, res, next) => {
   try {
     const id = req.query.id;
-    const user = req.user;
     await Category.findOneAndDelete(id);
-    await User.findByIdAndUpdate(user, { category: {} });
+    await User.findOneAndUpdate(
+      { _id: req.user },
+      { $unset: { category: null } },
+      { new: true }
+    );
     res.send(Responsehandler("Deleted"));
   } catch (error) {
     next(error);
