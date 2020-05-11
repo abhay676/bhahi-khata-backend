@@ -1,69 +1,72 @@
 const Expenses = require("../model/Expenses");
 const Wallets = require("../model/Wallets");
+const { ErrorHandler, Responsehandler } = require("../../services/Handler");
 
-// const generateMsg = require("../utils/GenerateMsg");
-// const msg = require("../utils/ToastMsg");
-
-// POST
-exports.add = async (req, res) => {
+exports.add = async (req, res, next) => {
   try {
-    const walletId = req.body.walletId;
-    const walletInfo = await Wallets.findById({ _id: walletId });
-    if (walletInfo.freeze) {
-      res.send(
-        generateMsg(msg.freezeWalletExpense, "error", msg.freezeWalletExpense)
-      );
+    const id = req.query.id;
+    const walletInfo = await Wallets.findOne({ walletId: id });
+    if (walletInfo.isFreezed) {
+      throw new ErrorHandler(403, "Wallet is freezed");
     }
-    if (walletInfo.active) {
-      const expense = new Expenses({ ...req.body, walletId });
-      await expense.save();
-      res.send(generateMsg(msg.expenseCreateSuccess, "success", expense));
-    }
-    res.send(generateMsg(msg.expensesAddError, "error", msg.expensesAddError));
+    const expense = new Expenses({ ...req.body, walletId: id });
+    await expense.save();
+    res.send(Responsehandler(expense));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 404;
+    next(error);
   }
 };
 
-// PATCH
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const expense = await Expenses.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true
-    });
-    res.send(generateMsg(msg.expenseUpdateSuccess, "success", expense));
-  } catch (error) {
-    res.send(generateMsg(null, "error", error));
-  }
-};
-
-// DELETE
-exports.delete = async (req, res) => {
-  try {
-    const id = req.params.id;
-    await Expenses.findByIdAndDelete(id);
-    res.send(
-      generateMsg(
-        msg.expenseDeletedSuccess,
-        "success",
-        msg.expenseDeletedSuccess
-      )
+    const id = req.query.id;
+    const wId = req.query.wid;
+    const expense = await Expenses.findOneAndUpdate(
+      { walletId: wId, expenseId: id },
+      { ...req.body },
+      {
+        new: true,
+        runValidators: true
+      }
     );
+    res.send(Responsehandler(expense));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 500;
+    next(error);
   }
 };
 
-// GET
-exports.getExpense = async (req, res) => {
+exports.delete = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const expense = await Expenses.findById(id);
-    if (!expense) throw new Error(msg.expenseAllError);
-    res.send(generateMsg(msg.expenseAllSuccess, "success", expense));
+    const id = req.query.id;
+    await Expenses.findOneAndDelete({ expenseId: id });
+    res.send(Responsehandler("Deleted"));
   } catch (error) {
-    res.send(generateMsg(null, "error", error));
+    error.code = 500;
+    next(error);
+  }
+};
+
+exports.getExpense = async (req, res, next) => {
+  try {
+    const id = req.query.id;
+    const expense = await Expenses.findById(id);
+    if (!expense) throw new ErrorHandler(404, "No expense found");
+    res.send(Responsehandler(expense));
+  } catch (error) {
+    error.code = 404;
+    next(error);
+  }
+};
+
+exports.getAllExpenses = async (req, res, next) => {
+  try {
+    const id = req.query.id;
+    const expense = await Expenses.find({ walletId: id });
+    res.send(Responsehandler(expense));
+  } catch (error) {
+    error.code = 404;
+    next(error);
   }
 };
